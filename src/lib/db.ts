@@ -1,5 +1,6 @@
 import { isSupabaseConfigured } from './supabase/config';
 import { createServiceClient } from './supabase/server';
+import { getPlaceholderMedia } from './placeholder-media';
 import {
   mockSites,
   mockDeals,
@@ -173,10 +174,12 @@ export async function getSiteContentBySlug(
       reviewCount: company.review_count,
     },
     brand: { primaryColor: '#6E8F7C' }, // TODO: source from a real brand table once templates need per-business brand color
-    media: {
-      heroImages: media.filter((m) => m.kind === 'hero').map((m) => ({ url: m.url, isPlaceholder: m.is_placeholder, alt: m.alt ?? '' })),
-      gallery: media.filter((m) => m.kind === 'gallery').map((m) => ({ url: m.url, isPlaceholder: m.is_placeholder, alt: m.alt ?? '' })),
-    },
+    media: (media.filter((m) => m.kind === 'hero').length > 0 || media.filter((m) => m.kind === 'gallery').length > 0)
+      ? {
+          heroImages: media.filter((m) => m.kind === 'hero').map((m) => ({ url: m.url, isPlaceholder: m.is_placeholder, alt: m.alt ?? '' })),
+          gallery: media.filter((m) => m.kind === 'gallery').map((m) => ({ url: m.url, isPlaceholder: m.is_placeholder, alt: m.alt ?? '' })),
+        }
+      : getPlaceholderMedia(company.category, company.id), // no real photos yet — category-matched placeholders instead of a blank hero
     services: (company?.company_services ?? [])
       .sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
       .map((s: any) => ({ name: s.name, description: s.description, price: s.price, imageUrl: s.image_url })),
