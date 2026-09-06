@@ -27,6 +27,14 @@ export async function GET() {
     const { data: sample, error: sampleError } = await supabase.from('deals').select('id, stage').limit(3);
     report.sampleRows = sample;
     report.sampleError = sampleError?.message ?? null;
+
+    const { data: joined, error: joinedError } = await supabase
+      .from('deals')
+      .select('id, stage, value, updated_at, companies(id, name, city), app_users(full_name)')
+      .order('updated_at', { ascending: false });
+    report.joinedCount = joined?.length ?? 0;
+    report.joinedError = joinedError?.message ?? null;
+    report.joinedSample = joined?.slice(0, 2) ?? null;
   } catch (e: any) {
     report.thrownError = e.message;
   }
