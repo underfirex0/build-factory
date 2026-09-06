@@ -1,9 +1,12 @@
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
+import { unstable_noStore as noStore } from 'next/cache';
 import { getDeals, getSites } from '@/lib/db';
 import { Panel, SectionLabel, StatCard, StageBadge, StatusDot } from '@/components/ui/primitives';
 
 export default async function DashboardPage() {
+  noStore();
   const [deals, sites] = await Promise.all([getDeals(), getSites()]);
 
   const totalDeals = deals.length;

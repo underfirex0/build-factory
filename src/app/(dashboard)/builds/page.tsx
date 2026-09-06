@@ -1,9 +1,12 @@
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
+import { unstable_noStore as noStore } from 'next/cache';
 import { getDeals, getTemplates } from '@/lib/db';
 import { BulkBuildForm } from '@/components/builds/BulkBuildForm';
 
 export default async function BuildsPage() {
+  noStore();
   const [deals, templates] = await Promise.all([getDeals(), getTemplates()]);
   const unbuilt = deals.filter((d) => d.stage === 'scraped');
 

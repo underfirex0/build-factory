@@ -1,11 +1,14 @@
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
+import { unstable_noStore as noStore } from 'next/cache';
 import { getDealByCompanyId, getSiteById, getActivities } from '@/lib/db';
 import { Panel, SectionLabel, StageBadge, StatusDot } from '@/components/ui/primitives';
 import { ActivationPanel } from '@/components/leads/ActivationPanel';
 import { notFound } from 'next/navigation';
 
 export default async function LeadDetailPage({ params }: { params: { id: string } }) {
+  noStore();
   const deal = await getDealByCompanyId(params.id);
   if (!deal) notFound();
   const [site, activities] = await Promise.all([

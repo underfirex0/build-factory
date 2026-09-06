@@ -1,11 +1,14 @@
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
+import { unstable_noStore as noStore } from 'next/cache';
 import Link from 'next/link';
 import { DEAL_STAGES } from '@/lib/schema';
 import { getDeals } from '@/lib/db';
 import { Panel, SectionLabel } from '@/components/ui/primitives';
 
 export default async function PipelinePage() {
+  noStore();
   const deals = await getDeals();
 
   return (

@@ -1,10 +1,13 @@
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
+import { unstable_noStore as noStore } from 'next/cache';
 import Link from 'next/link';
 import { getDeals } from '@/lib/db';
 import { Panel, StageBadge, Button } from '@/components/ui/primitives';
 
 export default async function LeadsPage() {
+  noStore();
   const deals = await getDeals();
 
   return (

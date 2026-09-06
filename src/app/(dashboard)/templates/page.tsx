@@ -1,5 +1,7 @@
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
+import { unstable_noStore as noStore } from 'next/cache';
 import { getTemplates } from '@/lib/db';
 import { Panel, SectionLabel, Button } from '@/components/ui/primitives';
 
@@ -10,6 +12,7 @@ const tierColor: Record<string, string> = {
 };
 
 export default async function TemplatesPage() {
+  noStore();
   const templates = await getTemplates();
 
   return (

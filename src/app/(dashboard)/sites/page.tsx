@@ -1,9 +1,12 @@
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
+import { unstable_noStore as noStore } from 'next/cache';
 import { getSites } from '@/lib/db';
 import { Panel, StatusDot } from '@/components/ui/primitives';
 
 export default async function SitesPage() {
+  noStore();
   const sites = await getSites();
 
   return (
