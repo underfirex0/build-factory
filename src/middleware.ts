@@ -9,25 +9,37 @@ import { NextRequest, NextResponse } from 'next/server';
  * request to /site/[slug], where the template fetches that business's
  * TemplateContent and renders. Bulk-building 500 sites is 500 database rows,
  * not 500 deploys.
+ *
+ * ROOT_DOMAIN is the domain business subdomains live under (e.g. "yako.studio").
+ * Until that's configured, this must default to something that will never
+ * match a real request host (Vercel preview URLs, localhost, custom domains
+ * added later) — otherwise every one of those gets mistaken for a business
+ * subdomain and 404s, which is exactly what happened on the *.vercel.app URL.
  */
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || '';
+
 export function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || '';
   const url = request.nextUrl;
 
-  // Skip the CRM app itself and internal Next.js paths
-  const isAppHost =
-    hostname.startsWith('app.') ||
-    hostname.startsWith('localhost') ||
-    hostname.startsWith('127.0.0.1');
+  if (url.pathname.startsWith('/_next') || url.pathname.startsWith('/api')) {
+    return NextResponse.next();
+  }
 
-  if (isAppHost || url.pathname.startsWith('/_next') || url.pathname.startsWith('/api')) {
+  // No root domain configured yet, or this request isn't on it (Vercel's own
+  // *.vercel.app URL, localhost, a not-yet-mapped domain) -> this is the CRM
+  // app itself, serve it normally, no rewrite.
+  const isBusinessSubdomain =
+    ROOT_DOMAIN && hostname.endsWith(`.${ROOT_DOMAIN}`) && hostname !== `app.${ROOT_DOMAIN}`;
+
+  if (!isBusinessSubdomain) {
     return NextResponse.next();
   }
 
   // yourbusiness.yako.studio -> slug = "yourbusiness"
   // a mapped custom domain resolves via a lookup table in production;
   // here we rewrite everything to a single dynamic route that does the lookup.
-  const subdomain = hostname.split('.')[0];
+  const subdomain = hostname.replace(`.${ROOT_DOMAIN}`, '');
   const rewriteTarget = `/site/${subdomain}${url.pathname}`;
 
   return NextResponse.rewrite(new URL(rewriteTarget, request.url));
