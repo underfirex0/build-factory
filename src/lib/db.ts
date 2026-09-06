@@ -1,5 +1,20 @@
-import { mockSites, mockDemoContent, mockActiveContent } from './mock-data';
+import {
+  mockSites,
+  mockDemoContent,
+  mockActiveContent,
+  mockDentalDemoContent,
+  mockDentalActiveContent,
+} from './mock-data';
 import type { TemplateContent } from './schema';
+
+// template id -> (slug, demo content, active content). Extend this map each
+// time a new template is registered — same source of truth as the preview
+// route's TEMPLATE_REGISTRY, just keyed by id instead of slug since that's
+// what a `sites` row stores.
+const TEMPLATE_CONTENT_BY_ID: Record<string, { slug: string; demo: TemplateContent; active: TemplateContent }> = {
+  t1: { slug: 'elite-restaurant', demo: mockDemoContent, active: mockActiveContent },
+  t2: { slug: 'pro-dental', demo: mockDentalDemoContent, active: mockDentalActiveContent },
+};
 
 /**
  * Swap this file's internals for real Supabase queries when you connect a
@@ -18,8 +33,9 @@ export async function getSiteContentBySlug(
   const site = mockSites.find((s) => s.slug === slug);
   if (!site) return null;
 
-  const templateSlug = site.templateId === 't1' ? 'elite-restaurant' : 'elite-restaurant'; // only one built so far
-  const content = site.status === 'active' ? mockActiveContent : mockDemoContent;
+  const entry = TEMPLATE_CONTENT_BY_ID[site.templateId];
+  if (!entry) return null;
 
-  return { templateSlug, content };
+  const content = site.status === 'active' ? entry.active : entry.demo;
+  return { templateSlug: entry.slug, content };
 }

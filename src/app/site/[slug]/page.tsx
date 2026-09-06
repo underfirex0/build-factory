@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation';
 import { getSiteContentBySlug } from '@/lib/db';
 import { EliteRestaurantTemplate } from '@/templates/elite-restaurant/Template';
+import { ProDentalTemplate } from '@/templates/pro-dental/Template';
 
 const TEMPLATE_REGISTRY: Record<string, React.ComponentType<{ content: any }>> = {
   'elite-restaurant': EliteRestaurantTemplate,
+  'pro-dental': ProDentalTemplate,
 };
 
 // This one route serves every business on this template — middleware.ts

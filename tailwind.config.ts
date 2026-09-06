@@ -40,6 +40,11 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
+        // Used by the pro-dental template. Rendered on generic fallbacks here;
+        // wire next/font/google (Fraunces + Plus Jakarta Sans) at real deploy
+        // where network access to fonts.googleapis.com is available.
+        display: ['Fraunces', 'Georgia', 'serif'],
+        warm: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         none: '0px',

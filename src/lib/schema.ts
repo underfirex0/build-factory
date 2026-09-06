@@ -106,6 +106,7 @@ export const templateContentSchema = z.object({
     })
     .optional(),
   social: z.array(z.object({ platform: z.string(), url: z.string() })).optional(),
+  badges: z.array(z.string()).optional(), // real credentials only, e.g. "Ordre National des Médecins Dentistes" — never invented
   seo: z.object({
     title: z.string(),
     description: z.string(),

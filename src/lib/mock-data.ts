@@ -88,3 +88,63 @@ export const mockActiveContent: TemplateContent = {
     ],
   },
 };
+
+export const mockDentalDemoContent: TemplateContent = {
+  status: 'demo',
+  business: {
+    id: 'c2',
+    name: 'Cabinet Dentaire Atlas',
+    category: 'dentist',
+    city: 'Rabat',
+    phone: '+212 537 00 00 00',
+    whatsapp: '+212 600 11 22 33',
+    address: '8 Avenue Fal Ould Oumeir, Rabat',
+    hours: [
+      { day: 'Mon–Fri', open: '09:00', close: '18:30' },
+      { day: 'Saturday', open: '09:00', close: '13:00' },
+      { day: 'Sunday', open: '', close: '', closed: true },
+    ],
+    description:
+      'A calm, modern dental practice in Rabat focused on gentle preventive care and same-day treatments.',
+    rating: 4.9,
+    reviewCount: 187,
+  },
+  brand: { primaryColor: '#6E8F7C', secondaryColor: '#C98C7D' },
+  media: {
+    heroImages: [{ url: '/placeholder/dental-hero.jpg', isPlaceholder: true, alt: 'Dental practice interior, placeholder' }],
+    gallery: [
+      { url: '/placeholder/dental-1.jpg', isPlaceholder: true, alt: 'Treatment room placeholder' },
+      { url: '/placeholder/dental-2.jpg', isPlaceholder: true, alt: 'Reception placeholder' },
+      { url: '/placeholder/dental-3.jpg', isPlaceholder: true, alt: 'Waiting area placeholder' },
+    ],
+  },
+  services: [
+    { name: 'Check-up & Cleaning', description: 'Full exam, cleaning, and X-rays if needed', price: '300 MAD' },
+    { name: 'Teeth Whitening', description: 'In-office whitening, one session', price: '1,200 MAD' },
+    { name: 'Invisalign', description: 'Clear aligner treatment, full course', price: 'From 18,000 MAD' },
+    { name: 'Dental Implants', description: 'Single implant, consultation included', price: 'From 6,500 MAD' },
+  ],
+  testimonials: [
+    { authorName: 'Nadia R.', text: 'First dentist visit in years that didn\'t make me anxious — genuinely gentle and clear about every step.', rating: 5, source: 'Google Reviews', date: '2026-08-02' },
+    { authorName: 'Karim T.', text: 'Same-day appointment for a chipped tooth, fixed within the hour. Very professional.', rating: 5, source: 'Google Reviews', date: '2026-07-18' },
+  ],
+  stats: { rating: 4.9, reviewCount: 187 },
+  badges: ['Ordre National des Médecins Dentistes du Maroc'],
+  seo: {
+    title: 'Cabinet Dentaire Atlas — Dentist in Rabat',
+    description: 'A calm, modern dental practice in Rabat offering preventive care, whitening, Invisalign, and implants.',
+  },
+};
+
+export const mockDentalActiveContent: TemplateContent = {
+  ...mockDentalDemoContent,
+  status: 'active',
+  media: {
+    heroImages: [{ url: '/real/atlas-hero.jpg', isPlaceholder: false, alt: 'Cabinet Dentaire Atlas treatment room' }],
+    gallery: [
+      { url: '/real/atlas-1.jpg', isPlaceholder: false, alt: 'Dr. Atlas with a patient' },
+      { url: '/real/atlas-2.jpg', isPlaceholder: false, alt: 'Reception area' },
+      { url: '/real/atlas-3.jpg', isPlaceholder: false, alt: 'Sterilization equipment' },
+    ],
+  },
+};
