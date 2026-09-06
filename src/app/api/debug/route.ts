@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
 import { createServiceClient } from '@/lib/supabase/server';
+import { getDeals } from '@/lib/db';
 
 // TEMPORARY — delete this route once the connection issue is diagnosed.
 export async function GET() {
@@ -35,6 +36,10 @@ export async function GET() {
     report.joinedCount = joined?.length ?? 0;
     report.joinedError = joinedError?.message ?? null;
     report.joinedSample = joined?.slice(0, 2) ?? null;
+
+    const realDeals = await getDeals();
+    report.getDealsCount = realDeals.length;
+    report.getDealsSample = realDeals.slice(0, 2);
   } catch (e: any) {
     report.thrownError = e.message;
   }
