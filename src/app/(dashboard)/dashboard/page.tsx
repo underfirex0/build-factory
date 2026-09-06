@@ -1,13 +1,17 @@
-import { mockDeals, mockSites } from '@/lib/mock-data';
+export const dynamic = 'force-dynamic';
+
+import { getDeals, getSites } from '@/lib/db';
 import { Panel, SectionLabel, StatCard, StageBadge, StatusDot } from '@/components/ui/primitives';
 
-export default function DashboardPage() {
-  const totalDeals = mockDeals.length;
-  const activated = mockDeals.filter((d) => d.stage === 'activated').length;
-  const revenue = mockDeals.reduce((sum, d) => sum + (d.value ?? 0), 0);
-  const demoViews = mockSites.reduce((sum, s) => sum + s.viewCount, 0);
+export default async function DashboardPage() {
+  const [deals, sites] = await Promise.all([getDeals(), getSites()]);
 
-  const recentActivity = [...mockDeals]
+  const totalDeals = deals.length;
+  const activated = deals.filter((d) => d.stage === 'activated').length;
+  const revenue = deals.reduce((sum, d) => sum + (d.value ?? 0), 0);
+  const demoViews = sites.reduce((sum, s) => sum + s.viewCount, 0);
+
+  const recentActivity = [...deals]
     .filter((d) => d.lastActivityAt)
     .sort((a, b) => (b.lastActivityAt! > a.lastActivityAt! ? 1 : -1))
     .slice(0, 6);
@@ -47,6 +51,9 @@ export default function DashboardPage() {
                 </div>
               </div>
             ))}
+            {recentActivity.length === 0 && (
+              <div className="px-4 py-6 text-sm text-base-500 text-center">No activity yet.</div>
+            )}
           </div>
         </Panel>
 
@@ -55,7 +62,7 @@ export default function DashboardPage() {
             <SectionLabel>Live sites</SectionLabel>
           </div>
           <div>
-            {mockSites.map((s) => (
+            {sites.map((s) => (
               <div
                 key={s.id}
                 className="flex items-center justify-between px-4 py-2.5 border-b border-base-800 last:border-0 text-sm"
@@ -70,6 +77,9 @@ export default function DashboardPage() {
                 <span className="text-xs text-base-500 font-mono">{s.viewCount} views</span>
               </div>
             ))}
+            {sites.length === 0 && (
+              <div className="px-4 py-6 text-sm text-base-500 text-center">No sites built yet.</div>
+            )}
           </div>
         </Panel>
       </div>

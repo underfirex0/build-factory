@@ -1,11 +1,17 @@
-import { mockDeals, mockSites } from '@/lib/mock-data';
-import { Panel, SectionLabel, StageBadge, StatusDot, Button } from '@/components/ui/primitives';
+export const dynamic = 'force-dynamic';
+
+import { getDealByCompanyId, getSiteById, getActivities } from '@/lib/db';
+import { Panel, SectionLabel, StageBadge, StatusDot } from '@/components/ui/primitives';
+import { ActivationPanel } from '@/components/leads/ActivationPanel';
 import { notFound } from 'next/navigation';
 
-export default function LeadDetailPage({ params }: { params: { id: string } }) {
-  const deal = mockDeals.find((d) => d.companyId === params.id);
+export default async function LeadDetailPage({ params }: { params: { id: string } }) {
+  const deal = await getDealByCompanyId(params.id);
   if (!deal) notFound();
-  const site = mockSites.find((s) => s.id === deal.siteId);
+  const [site, activities] = await Promise.all([
+    deal.siteId ? getSiteById(deal.siteId) : Promise.resolve(null),
+    getActivities(deal.id),
+  ]);
 
   return (
     <div className="p-8 max-w-4xl">
@@ -50,86 +56,29 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
               <SectionLabel>Activity timeline</SectionLabel>
             </div>
             <div className="p-4 flex flex-col gap-3 text-sm">
-              <TimelineItem channel="system" text="Lead scraped from Google Maps" time="Aug 30" />
-              <TimelineItem channel="system" text={`Demo built on ${site?.templateName ?? 'template'}`} time="Sep 1" />
-              <TimelineItem channel="whatsapp" text="Demo link sent" time="Sep 2" />
-              {deal.lastActivityAt && (
-                <TimelineItem channel="whatsapp" text="Last touchpoint" time={deal.lastActivityAt} />
+              {activities.length > 0 ? (
+                activities.map((a, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <span className="text-[11px] font-mono text-base-500 w-20 shrink-0 pt-0.5">
+                      {new Date(a.createdAt).toLocaleDateString()}
+                    </span>
+                    <span className="text-[10px] uppercase tracking-wide text-base-500 border border-base-700 px-1.5 py-0.5 shrink-0">
+                      {a.channel}
+                    </span>
+                    <span className="text-base-200">{a.content}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-base-500">
+                  No logged activity yet — connect Supabase to start recording payments and content intake here.
+                </p>
               )}
             </div>
           </Panel>
         </div>
 
-        <div className="flex flex-col gap-4">
-          <Panel className="p-4">
-            <SectionLabel>Activate this site</SectionLabel>
-            <p className="text-xs text-base-400 mb-3">
-              Log the deal once the rep closes it over WhatsApp/call — this is what turns a demo into a live paid site.
-            </p>
-            <div className="flex flex-col gap-2 text-sm">
-              <LabeledInput label="Amount (MAD)" placeholder="6000" />
-              <LabeledInput label="Payment method" placeholder="Cash / transfer" />
-              <LabeledSelect label="Domain" options={['Keep subdomain', 'Custom domain']} />
-              <Button className="mt-2 w-full justify-center">Log payment</Button>
-            </div>
-          </Panel>
-
-          <Panel className="p-4">
-            <SectionLabel>Content intake</SectionLabel>
-            <p className="text-xs text-base-400 mb-3">
-              Generates a no-login upload link to send the client so they can drop their real photos.
-            </p>
-            <Button variant="secondary" className="w-full justify-center">Generate upload link</Button>
-          </Panel>
-
-          <Panel className="p-4">
-            <SectionLabel>Publish</SectionLabel>
-            <p className="text-xs text-base-400 mb-3">
-              Swaps placeholder images for real ones and removes the demo banner. Requires payment logged and content received.
-            </p>
-            <Button variant="secondary" className="w-full justify-center" disabled>
-              Waiting on content
-            </Button>
-          </Panel>
-        </div>
+        <ActivationPanel dealId={deal.id} companyId={deal.companyId} siteId={site?.id} />
       </div>
     </div>
-  );
-}
-
-function TimelineItem({ channel, text, time }: { channel: string; text: string; time: string }) {
-  return (
-    <div className="flex items-start gap-3">
-      <span className="text-[11px] font-mono text-base-500 w-14 shrink-0 pt-0.5">{time}</span>
-      <span className="text-[10px] uppercase tracking-wide text-base-500 border border-base-700 px-1.5 py-0.5 shrink-0">
-        {channel}
-      </span>
-      <span className="text-base-200">{text}</span>
-    </div>
-  );
-}
-
-function LabeledInput({ label, placeholder }: { label: string; placeholder: string }) {
-  return (
-    <label className="flex flex-col gap-1">
-      <span className="text-xs text-base-400">{label}</span>
-      <input
-        placeholder={placeholder}
-        className="bg-base-800 border border-base-700 px-2.5 py-1.5 text-sm text-base-100 focus:outline-none focus:border-signal"
-      />
-    </label>
-  );
-}
-
-function LabeledSelect({ label, options }: { label: string; options: string[] }) {
-  return (
-    <label className="flex flex-col gap-1">
-      <span className="text-xs text-base-400">{label}</span>
-      <select className="bg-base-800 border border-base-700 px-2.5 py-1.5 text-sm text-base-100 focus:outline-none focus:border-signal">
-        {options.map((o) => (
-          <option key={o}>{o}</option>
-        ))}
-      </select>
-    </label>
   );
 }

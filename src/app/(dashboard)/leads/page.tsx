@@ -1,8 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
-import { mockDeals } from '@/lib/mock-data';
+import { getDeals } from '@/lib/db';
 import { Panel, StageBadge, Button } from '@/components/ui/primitives';
 
-export default function LeadsPage() {
+export default async function LeadsPage() {
+  const deals = await getDeals();
+
   return (
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
@@ -26,7 +30,7 @@ export default function LeadsPage() {
             </tr>
           </thead>
           <tbody>
-            {mockDeals.map((d) => (
+            {deals.map((d) => (
               <tr key={d.id} className="border-b border-base-800 last:border-0 hover:bg-base-800/40">
                 <td className="px-4 py-2.5">
                   <Link href={`/leads/${d.companyId}`} className="text-base-100 hover:text-signal">
@@ -42,6 +46,11 @@ export default function LeadsPage() {
                 </td>
               </tr>
             ))}
+            {deals.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-4 py-6 text-sm text-base-500 text-center">No leads yet.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </Panel>

@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import clsx from 'clsx';
-import { LayoutDashboard, Users, Layers, Globe, Hammer, KanbanSquare } from 'lucide-react';
+import { LayoutDashboard, Users, Layers, Globe, Hammer, KanbanSquare, LogOut } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 const NAV = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -14,8 +15,23 @@ const NAV = [
   { href: '/sites', label: 'Sites', icon: Globe },
 ];
 
+// Env vars are inlined at build time, so this check works fine client-side —
+// it just controls whether the sign-out button renders, matching whether
+// middleware.ts is actually enforcing auth.
+const supabaseConfigured =
+  !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  }
+
   return (
     <aside className="w-56 shrink-0 border-r border-base-700 bg-base-900 h-screen sticky top-0 flex flex-col">
       <div className="px-4 py-4 border-b border-base-700">
@@ -42,6 +58,15 @@ export function Sidebar() {
           );
         })}
       </nav>
+      {supabaseConfigured && (
+        <button
+          onClick={handleSignOut}
+          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-base-400 hover:text-base-100 border-t border-base-700"
+        >
+          <LogOut size={15} />
+          Sign out
+        </button>
+      )}
       <div className="px-4 py-3 border-t border-base-700 text-[11px] text-base-500 font-mono">
         v0.1 — 6 sites live
       </div>

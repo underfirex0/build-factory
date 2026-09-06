@@ -1,9 +1,13 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { DEAL_STAGES } from '@/lib/schema';
-import { mockDeals } from '@/lib/mock-data';
+import { getDeals } from '@/lib/db';
 import { Panel, SectionLabel } from '@/components/ui/primitives';
 
-export default function PipelinePage() {
+export default async function PipelinePage() {
+  const deals = await getDeals();
+
   return (
     <div className="p-8">
       <div className="mb-6">
@@ -15,15 +19,15 @@ export default function PipelinePage() {
 
       <div className="flex gap-3 overflow-x-auto pb-4">
         {DEAL_STAGES.map((stage) => {
-          const deals = mockDeals.filter((d) => d.stage === stage.value);
+          const stageDeals = deals.filter((d) => d.stage === stage.value);
           return (
             <div key={stage.value} className="w-64 shrink-0">
               <div className="flex items-center justify-between mb-2 px-1">
                 <SectionLabel>{stage.label}</SectionLabel>
-                <span className="text-xs text-base-500 font-mono">{deals.length}</span>
+                <span className="text-xs text-base-500 font-mono">{stageDeals.length}</span>
               </div>
               <div className="flex flex-col gap-2">
-                {deals.map((d) => (
+                {stageDeals.map((d) => (
                   <Link key={d.id} href={`/leads/${d.companyId}`}>
                     <Panel className="p-3 hover:border-base-500 transition-colors cursor-pointer">
                       <div className="text-sm text-base-100">{d.companyName}</div>
@@ -37,7 +41,7 @@ export default function PipelinePage() {
                     </Panel>
                   </Link>
                 ))}
-                {deals.length === 0 && (
+                {stageDeals.length === 0 && (
                   <div className="text-xs text-base-600 border border-dashed border-base-800 px-3 py-4 text-center">
                     Empty
                   </div>

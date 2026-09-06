@@ -48,6 +48,17 @@ create table company_reviews (
   created_at timestamptz default now()
 );
 
+create table company_services (
+  id uuid primary key default uuid_generate_v4(),
+  company_id uuid references companies(id) on delete cascade,
+  name text not null,
+  description text,
+  price text,                           -- free-form ("300 MAD", "From 6,500 MAD") — not a number, currencies/ranges vary
+  image_url text,
+  sort_order int default 0,
+  created_at timestamptz default now()
+);
+
 -- ============================================================
 -- TEMPLATES (the design system — versioned, reusable, multi-tenant)
 -- ============================================================
@@ -151,7 +162,19 @@ create table invoices (
   paid_at timestamptz
 );
 
+-- No-login content intake links generated at activation time, per the
+-- "manual close, rep sends a link" flow.
+create table upload_tokens (
+  token uuid primary key default uuid_generate_v4(),
+  deal_id uuid references deals(id) on delete cascade,
+  company_id uuid references companies(id) on delete cascade,
+  used_at timestamptz,
+  created_at timestamptz default now(),
+  expires_at timestamptz default (now() + interval '14 days')
+);
+
 create index idx_sites_company on sites(company_id);
 create index idx_deals_stage on deals(stage);
 create index idx_activities_deal on activities(deal_id);
 create index idx_company_media_company on company_media(company_id);
+create index idx_company_services_company on company_services(company_id);

@@ -1,4 +1,6 @@
-import { mockTemplates } from '@/lib/mock-data';
+export const dynamic = 'force-dynamic';
+
+import { getTemplates } from '@/lib/db';
 import { Panel, SectionLabel, Button } from '@/components/ui/primitives';
 
 const tierColor: Record<string, string> = {
@@ -7,7 +9,9 @@ const tierColor: Record<string, string> = {
   starter: 'text-base-400 border-base-600',
 };
 
-export default function TemplatesPage() {
+export default async function TemplatesPage() {
+  const templates = await getTemplates();
+
   return (
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
@@ -19,7 +23,7 @@ export default function TemplatesPage() {
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        {mockTemplates.map((t) => (
+        {templates.map((t) => (
           <Panel key={t.id} className="p-4">
             <div className="flex items-center justify-between mb-3">
               <span className={`text-[11px] uppercase px-1.5 py-0.5 border font-mono ${tierColor[t.tier]}`}>

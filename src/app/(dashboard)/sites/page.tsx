@@ -1,7 +1,11 @@
-import { mockSites } from '@/lib/mock-data';
+export const dynamic = 'force-dynamic';
+
+import { getSites } from '@/lib/db';
 import { Panel, StatusDot } from '@/components/ui/primitives';
 
-export default function SitesPage() {
+export default async function SitesPage() {
+  const sites = await getSites();
+
   return (
     <div className="p-8">
       <div className="mb-6">
@@ -21,7 +25,7 @@ export default function SitesPage() {
             </tr>
           </thead>
           <tbody>
-            {mockSites.map((s) => (
+            {sites.map((s) => (
               <tr key={s.id} className="border-b border-base-800 last:border-0 hover:bg-base-800/40">
                 <td className="px-4 py-2.5 text-base-100">{s.companyName}</td>
                 <td className="px-4 py-2.5 text-base-300 font-mono text-xs">
@@ -37,6 +41,11 @@ export default function SitesPage() {
                 <td className="px-4 py-2.5 font-mono text-xs text-base-400">{s.viewCount}</td>
               </tr>
             ))}
+            {sites.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-4 py-6 text-sm text-base-500 text-center">No sites yet.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </Panel>
